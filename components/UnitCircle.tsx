@@ -1,18 +1,17 @@
 import React, { useRef, useState } from 'react';
 import { ActiveFunctions, Options } from './TrigSimulation';
-import { SPECIAL_ANGLES_DATA, Mode } from '../lib/trig';
+import { SPECIAL_ANGLES_DATA } from '../lib/trig';
 
 interface Props {
   angle: number;
   setAngle: (angle: number) => void;
   activeFunctions: ActiveFunctions;
   options: Options;
-  mode: Mode;
 }
 
 const SPECIAL_ANGLES_RAD = SPECIAL_ANGLES_DATA.map(a => a.deg * Math.PI / 180);
 
-export default function UnitCircle({ angle, setAngle, activeFunctions, options, mode }: Props) {
+export default function UnitCircle({ angle, setAngle, activeFunctions, options }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -44,7 +43,7 @@ export default function UnitCircle({ angle, setAngle, activeFunctions, options, 
     let newAngle = Math.atan2(y, x);
     if (newAngle < 0) newAngle += 2 * Math.PI;
     
-    if (options.specialAngles || mode === 'concept') {
+    if (options.specialAngles) {
       const snapThreshold = 0.08; // radians
       for (const special of SPECIAL_ANGLES_RAD) {
         // Handle wrap around for 0 and 2PI
@@ -79,20 +78,6 @@ export default function UnitCircle({ angle, setAngle, activeFunctions, options, 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
       {/* Concept Mode Explanations */}
-      {mode === 'concept' && (
-        <div className="absolute top-0 left-0 right-0 flex flex-col gap-2 pointer-events-none z-10 p-2">
-          {activeFunctions.sin && (
-            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-2 rounded-lg text-xs sm:text-sm shadow-sm transition-opacity duration-300">
-              <strong className="font-mono">sin(θ)</strong> is the vertical distance (y-coordinate)
-            </div>
-          )}
-          {activeFunctions.cos && (
-            <div className="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-2 rounded-lg text-xs sm:text-sm shadow-sm transition-opacity duration-300">
-              <strong className="font-mono">cos(θ)</strong> is the horizontal distance (x-coordinate)
-            </div>
-          )}
-        </div>
-      )}
 
       <svg 
         ref={svgRef}
@@ -138,14 +123,14 @@ export default function UnitCircle({ angle, setAngle, activeFunctions, options, 
       <path d={`M 0 0 L 0.2 0 ${getArcPath().replace('M 0.2 0 ', '')} Z`} fill="rgba(59, 130, 246, 0.1)" />
       
       {/* Triangle */}
-      {(options.triangle || mode === 'concept') && (
+      {options.triangle && (
         <g>
           {/* hypotenuse */}
           <line x1="0" y1="0" x2={x} y2={-y} stroke="#475569" strokeWidth="0.02" />
           {/* sin line */}
-          {activeFunctions.sin && <line x1={x} y1="0" x2={x} y2={-y} stroke="#10b981" strokeWidth={mode === 'concept' ? "0.04" : "0.03"} className="transition-all duration-300" />}
+          {activeFunctions.sin && <line x1={x} y1="0" x2={x} y2={-y} stroke="#10b981" strokeWidth="0.03" className="transition-all duration-300" />}
           {/* cos line */}
-          {activeFunctions.cos && <line x1="0" y1="0" x2={x} y2="0" stroke="#3b82f6" strokeWidth={mode === 'concept' ? "0.04" : "0.03"} className="transition-all duration-300" />}
+          {activeFunctions.cos && <line x1="0" y1="0" x2={x} y2="0" stroke="#3b82f6" strokeWidth="0.03" className="transition-all duration-300" />}
         </g>
       )}
 
@@ -165,8 +150,8 @@ export default function UnitCircle({ angle, setAngle, activeFunctions, options, 
         cy={-y} 
         r={isDragging ? "0.1" : "0.08"} 
         fill="#ef4444" 
-        className={`cursor-grab active:cursor-grabbing transition-all duration-200 ${mode === 'concept' ? 'drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]' : ''}`} 
-        style={{ filter: mode === 'concept' ? 'drop-shadow(0 0 8px rgba(239,68,68,0.8))' : 'drop-shadow(0 0 4px rgba(239,68,68,0.5))' }}
+        className="cursor-grab active:cursor-grabbing transition-all duration-200" 
+        style={{ filter: 'drop-shadow(0 0 4px rgba(239,68,68,0.5))' }}
       />
 
       {/* Point Coordinates */}
@@ -184,7 +169,7 @@ export default function UnitCircle({ angle, setAngle, activeFunctions, options, 
       )}
 
       {/* Labels */}
-      {options.labels && mode !== 'concept' && (
+      {options.labels && (
         <g fontSize="0.1" className="fill-slate-500 font-medium select-none" textAnchor="middle" dominantBaseline="middle">
           <text x="1.15" y="0">0</text>
           <text x="0" y="-1.15">π/2</text>

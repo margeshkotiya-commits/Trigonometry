@@ -18,4 +18,4 @@ export const SPECIAL_ANGLES_DATA = [
   { deg: 360, rad: '2π', sin: '0', cos: '1', tan: '0' },
 ];
 
-export type Mode = 'explore' | 'practice' | 'concept';
+export type Mode = 'explore' | 'practice';
