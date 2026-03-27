@@ -25,6 +25,12 @@ export default function IntroScreen({ onStart }: Props) {
           <path d="M 50 50 L 21.72 21.72" stroke="#FFD700" strokeWidth="0.5" />
           <path d="M 50 50 L 21.72 78.28" stroke="#FFD700" strokeWidth="0.5" />
           <path d="M 50 50 L 78.28 78.28" stroke="#FFD700" strokeWidth="0.5" />
+          
+          {/* Animated Radius */}
+          <g style={{ transformOrigin: '50px 50px', animation: 'spin 25s linear infinite reverse' }}>
+            <line x1="50" y1="50" x2="90" y2="50" stroke="#FFD700" strokeWidth="1" />
+            <circle cx="90" cy="50" r="1.5" fill="#FFD700" />
+          </g>
         </svg>
       </div>
 
