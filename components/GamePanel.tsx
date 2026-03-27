@@ -87,13 +87,13 @@ export default function GamePanel({ setAngle, setActiveFunctions }: Props) {
 
   if (feedback === 'win') {
     return (
-      <div className="bg-white rounded-2xl shadow-md p-5 w-full max-w-sm flex flex-col items-center justify-center gap-4 text-center border border-slate-100 h-full">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md p-5 w-full max-w-sm flex flex-col items-center justify-center gap-4 text-center border border-slate-100 dark:border-slate-700 h-full transition-colors duration-300">
         <Trophy className="w-16 h-16 text-yellow-500 mb-2" />
-        <h2 className="text-2xl font-bold text-slate-800">You Win!</h2>
-        <p className="text-slate-600">Final Score: {score}</p>
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">You Win!</h2>
+        <p className="text-slate-600 dark:text-slate-300">Final Score: {score}</p>
         <button 
           onClick={resetGame}
-          className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors"
+          className="mt-4 px-6 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
         >
           Play Again
         </button>
@@ -102,36 +102,36 @@ export default function GamePanel({ setAngle, setActiveFunctions }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-3 sm:p-4 md:p-5 w-full max-w-sm flex flex-col gap-2 sm:gap-3 md:gap-4 font-sans border border-slate-100 h-full">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md p-3 sm:p-4 md:p-5 w-full max-w-sm flex flex-col gap-2 sm:gap-3 md:gap-4 font-sans border border-slate-100 dark:border-slate-700 h-full transition-colors duration-300">
       {/* Header */}
-      <div className="flex justify-between items-center border-b border-slate-100 pb-2 sm:pb-3 shrink-0">
+      <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2 sm:pb-3 shrink-0">
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <Target className="text-indigo-500 w-4 h-4 sm:w-5 sm:h-5" />
-          <h2 className="text-base sm:text-lg font-bold text-slate-800">Practice</h2>
+          <Target className="text-indigo-500 dark:text-indigo-400 w-4 h-4 sm:w-5 sm:h-5" />
+          <h2 className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100">Practice</h2>
         </div>
-        <div className="flex items-center gap-1 bg-amber-100 text-amber-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg font-bold text-xs sm:text-sm">
+        <div className="flex items-center gap-1 bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg font-bold text-xs sm:text-sm">
           <Star className="w-3 h-3 sm:w-4 sm:h-4" /> {score}
         </div>
       </div>
 
       {/* Level & Progress */}
       <div className="shrink-0">
-        <div className="flex justify-between text-xs sm:text-sm font-semibold text-slate-500 mb-1 sm:mb-2">
+        <div className="flex justify-between text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1 sm:mb-2">
           <span>Level {level}: {level === 1 ? 'Sine' : level === 2 ? 'Cosine' : 'Tangent'}</span>
           <span>{progress}/5</span>
         </div>
-        <div className="w-full bg-slate-100 h-1.5 sm:h-2 rounded-full overflow-hidden">
+        <div className="w-full bg-slate-100 dark:bg-slate-700 h-1.5 sm:h-2 rounded-full overflow-hidden">
           <div 
-            className="bg-indigo-500 h-full transition-all duration-300"
+            className="bg-indigo-500 dark:bg-indigo-400 h-full transition-all duration-300"
             style={{ width: `${(progress / 5) * 100}%` }}
           />
         </div>
       </div>
 
       {/* Question */}
-      <div className="bg-slate-50 rounded-xl p-2 sm:p-4 text-center border border-slate-100 shrink-0">
-        <p className="text-xs sm:text-sm text-slate-500 font-medium mb-0.5 sm:mb-1">What is the value of</p>
-        <p className="text-xl sm:text-3xl font-bold text-slate-800">
+      <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-2 sm:p-4 text-center border border-slate-100 dark:border-slate-700 shrink-0 transition-colors duration-300">
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mb-0.5 sm:mb-1">What is the value of</p>
+        <p className="text-xl sm:text-3xl font-bold text-slate-800 dark:text-slate-100">
           {currentQuestion?.func}({currentQuestion?.angle}°)
         </p>
       </div>
@@ -139,7 +139,7 @@ export default function GamePanel({ setAngle, setActiveFunctions }: Props) {
       {/* Feedback */}
       {feedback && (feedback === 'correct' || feedback === 'incorrect') && (
         <div className={`p-2 sm:p-3 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2 font-bold text-sm sm:text-base shrink-0 ${
-          feedback === 'correct' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+          feedback === 'correct' ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'
         }`}>
           {feedback === 'correct' ? (
             <><CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" /> Correct! +100</>
@@ -152,18 +152,18 @@ export default function GamePanel({ setAngle, setActiveFunctions }: Props) {
       {/* Options Grid */}
       <div className="grid grid-cols-2 gap-1.5 sm:gap-2 mt-auto overflow-y-auto pb-1">
         {OPTIONS.map(opt => {
-          let btnClass = "py-1.5 sm:py-2 px-1 rounded-lg border font-medium text-xs sm:text-sm transition-all hover:bg-slate-50 hover:border-indigo-300 ";
+          let btnClass = "py-1.5 sm:py-2 px-1 rounded-lg border font-medium text-xs sm:text-sm transition-all hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500 ";
           
           if (selectedAnswer === opt) {
             if (feedback === 'correct') {
-              btnClass = "py-2 px-1 rounded-lg border-2 border-green-500 bg-green-50 text-green-700 font-bold ";
+              btnClass = "py-2 px-1 rounded-lg border-2 border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold ";
             } else if (feedback === 'incorrect') {
-              btnClass = "py-2 px-1 rounded-lg border-2 border-red-500 bg-red-50 text-red-700 font-bold ";
+              btnClass = "py-2 px-1 rounded-lg border-2 border-red-500 dark:border-red-400 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 font-bold ";
             }
           } else if (feedback === 'incorrect' && opt === currentQuestion?.answer) {
-            btnClass = "py-2 px-1 rounded-lg border-2 border-green-500 bg-green-50 text-green-700 font-bold animate-pulse ";
+            btnClass = "py-2 px-1 rounded-lg border-2 border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold animate-pulse ";
           } else {
-            btnClass += "bg-white border-slate-200 text-slate-700 ";
+            btnClass += "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 ";
           }
 
           return (

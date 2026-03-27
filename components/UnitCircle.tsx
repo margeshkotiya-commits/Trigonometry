@@ -7,11 +7,12 @@ interface Props {
   setAngle: (angle: number) => void;
   activeFunctions: ActiveFunctions;
   options: Options;
+  isDark?: boolean;
 }
 
 const SPECIAL_ANGLES_RAD = SPECIAL_ANGLES_DATA.map(a => a.deg * Math.PI / 180);
 
-export default function UnitCircle({ angle, setAngle, activeFunctions, options }: Props) {
+export default function UnitCircle({ angle, setAngle, activeFunctions, options, isDark = false }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -90,7 +91,7 @@ export default function UnitCircle({ angle, setAngle, activeFunctions, options }
       >
       {/* Grid */}
       {options.grid && (
-        <g className="text-slate-100" strokeWidth="0.02" stroke="currentColor">
+        <g className={isDark ? "text-slate-800" : "text-slate-100"} strokeWidth="0.02" stroke="currentColor">
           {[-1, -0.5, 0.5, 1].map(val => (
             <React.Fragment key={val}>
               <line x1="-1.5" y1={val} x2="1.5" y2={val} />
@@ -101,17 +102,17 @@ export default function UnitCircle({ angle, setAngle, activeFunctions, options }
       )}
       
       {/* Axes */}
-      <g className="text-slate-300" strokeWidth="0.02" stroke="currentColor">
+      <g className={isDark ? "text-slate-600" : "text-slate-300"} strokeWidth="0.02" stroke="currentColor">
         <line x1="-1.5" y1="0" x2="1.5" y2="0" />
         <line x1="0" y1="-1.5" x2="0" y2="1.5" />
       </g>
       
       {/* Circle */}
-      <circle cx="0" cy="0" r="1" fill="none" stroke="#94a3b8" strokeWidth="0.02" />
+      <circle cx="0" cy="0" r="1" fill="none" stroke={isDark ? "#475569" : "#94a3b8"} strokeWidth="0.02" />
       
       {/* Special Angles Markers */}
       {options.specialAngles && (
-        <g className="text-slate-300" strokeWidth="0.01" stroke="currentColor">
+        <g className={isDark ? "text-slate-700" : "text-slate-300"} strokeWidth="0.01" stroke="currentColor">
           {SPECIAL_ANGLES_RAD.map((rad, i) => (
             <line key={i} x1="0" y1="0" x2={Math.cos(rad)} y2={-Math.sin(rad)} strokeDasharray="0.02 0.02" />
           ))}
@@ -160,7 +161,7 @@ export default function UnitCircle({ angle, setAngle, activeFunctions, options }
           x={x + (x > 0 ? 0.12 : -0.12)} 
           y={-y + (y > 0 ? -0.12 : 0.12)} 
           fontSize="0.08" 
-          className="fill-slate-700 font-mono select-none"
+          className={`${isDark ? "fill-slate-300" : "fill-slate-700"} font-mono select-none`}
           textAnchor={x > 0 ? "start" : "end"}
           dominantBaseline="middle"
         >
@@ -170,7 +171,7 @@ export default function UnitCircle({ angle, setAngle, activeFunctions, options }
 
       {/* Labels */}
       {options.labels && (
-        <g fontSize="0.1" className="fill-slate-500 font-medium select-none" textAnchor="middle" dominantBaseline="middle">
+        <g fontSize="0.1" className={`${isDark ? "fill-slate-400" : "fill-slate-500"} font-medium select-none`} textAnchor="middle" dominantBaseline="middle">
           <text x="1.15" y="0">0</text>
           <text x="0" y="-1.15">π/2</text>
           <text x="-1.15" y="0">π</text>

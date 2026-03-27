@@ -9,6 +9,7 @@ import ValuesPanel from './ValuesPanel';
 import GamePanel from './GamePanel';
 import TutorialOverlay from './TutorialOverlay';
 import ExplanationModal from './ExplanationModal';
+import IntroScreen from './IntroScreen';
 import { Gamepad2, Compass, Maximize2, Minimize2 } from 'lucide-react';
 import { Mode } from '../lib/trig';
 
@@ -17,6 +18,7 @@ export type Options = { specialAngles: boolean; labels: boolean; grid: boolean; 
 
 export default function TrigSimulation() {
   const [isMounted, setIsMounted] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const [angle, setAngle] = useState(Math.PI / 4); // 45 degrees
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed] = useState(0.5); // radians per second
@@ -72,6 +74,10 @@ export default function TrigSimulation() {
         </div>
       </div>
     );
+  }
+
+  if (!hasStarted) {
+    return <IntroScreen onStart={() => setHasStarted(true)} />;
   }
 
   return (
@@ -131,6 +137,7 @@ export default function TrigSimulation() {
               setActiveFunctions={setActiveFunctions}
               options={options}
               setOptions={setOptions}
+              angle={angle}
               setAngle={setAngle}
             />
           </div>

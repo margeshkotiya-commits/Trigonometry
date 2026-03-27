@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, Settings2 } from 'lucide-react';
 import { ActiveFunctions, Options } from './TrigSimulation';
 
@@ -9,12 +9,77 @@ interface Props {
   setActiveFunctions: (val: ActiveFunctions) => void;
   options: Options;
   setOptions: (val: Options) => void;
+  angle: number;
   setAngle: (val: number) => void;
 }
 
-export default function Controls({ isPlaying, setIsPlaying, activeFunctions, setActiveFunctions, options, setOptions, setAngle }: Props) {
+export default function Controls({ isPlaying, setIsPlaying, activeFunctions, setActiveFunctions, options, setOptions, angle, setAngle }: Props) {
+  const [inputUnit, setInputUnit] = useState<'degrees' | 'radians'>('degrees');
+  const [inputValue, setInputValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(() => {
+    if (isFocused) return;
+    let normalized = angle % (2 * Math.PI);
+    if (normalized < 0) normalized += 2 * Math.PI;
+
+    if (inputUnit === 'degrees') {
+      let deg = Math.round(normalized * 180 / Math.PI);
+      if (deg === 360) deg = 0;
+      setInputValue(deg.toString());
+    } else {
+      setInputValue(normalized.toFixed(3));
+    }
+  }, [angle, inputUnit, isFocused]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+    const val = parseFloat(e.target.value);
+    if (!isNaN(val)) {
+      if (inputUnit === 'degrees') {
+        setAngle(val * Math.PI / 180);
+      } else {
+        setAngle(val);
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 h-full">
+      {/* Angle Input */}
+      <div className="shrink-0">
+        <h2 className="text-xs sm:text-sm font-semibold text-slate-500 mb-2 sm:mb-3 uppercase tracking-wider">Set Angle</h2>
+        <div className="flex flex-col gap-2">
+          <div className="flex p-1 bg-slate-100 rounded-lg w-full">
+            <label className={`flex-1 flex items-center justify-center py-1 rounded-md cursor-pointer transition-all ${inputUnit === 'degrees' ? 'bg-white shadow-sm border border-slate-200/50' : 'opacity-70 hover:opacity-100'}`}>
+              <input type="radio" name="controlsAngleUnit" value="degrees" checked={inputUnit === 'degrees'} onChange={() => setInputUnit('degrees')} className="sr-only" />
+              <span className={`text-xs sm:text-sm ${inputUnit === 'degrees' ? 'font-semibold text-slate-800' : 'font-medium text-slate-600'}`}>Degrees</span>
+            </label>
+            <label className={`flex-1 flex items-center justify-center py-1 rounded-md cursor-pointer transition-all ${inputUnit === 'radians' ? 'bg-white shadow-sm border border-slate-200/50' : 'opacity-70 hover:opacity-100'}`}>
+              <input type="radio" name="controlsAngleUnit" value="radians" checked={inputUnit === 'radians'} onChange={() => setInputUnit('radians')} className="sr-only" />
+              <span className={`text-xs sm:text-sm ${inputUnit === 'radians' ? 'font-semibold text-slate-800' : 'font-medium text-slate-600'}`}>Radians</span>
+            </label>
+          </div>
+          <div className="relative">
+            <input 
+              type="number" 
+              value={inputValue}
+              onChange={handleInputChange}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm sm:text-base rounded-xl px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all font-mono"
+              placeholder={inputUnit === 'degrees' ? "e.g. 45" : "e.g. 0.785"}
+              step="any"
+            />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm pointer-events-none">
+              {inputUnit === 'degrees' ? '°' : 'rad'}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr className="border-slate-100 shrink-0" />
+
       {/* Playback */}
       <div className="shrink-0">
         <h2 className="text-xs sm:text-sm font-semibold text-slate-500 mb-2 sm:mb-3 uppercase tracking-wider">Playback</h2>

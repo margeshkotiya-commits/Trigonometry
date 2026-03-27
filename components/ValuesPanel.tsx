@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ActiveFunctions } from './TrigSimulation';
 import { Calculator, Info } from 'lucide-react';
 import { SPECIAL_ANGLES_DATA } from '../lib/trig';
@@ -18,7 +18,18 @@ export default function ValuesPanel({ angle, activeFunctions, onExplain }: Props
   let deg = Math.round(normalized * 180 / Math.PI);
   if (deg === 360) deg = 0;
   
-  const specialAngle = SPECIAL_ANGLES_DATA.find(a => a.deg === deg);
+  const specialAngle = useMemo(() => {
+    return SPECIAL_ANGLES_DATA.find(a => a.deg === deg);
+  }, [deg]);
+
+  const [displaySpecial, setDisplaySpecial] = useState(!!specialAngle);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDisplaySpecial(!!specialAngle);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [specialAngle]);
 
   const rad = specialAngle ? specialAngle.rad : (normalized / Math.PI).toFixed(3) + 'π';
 
@@ -45,18 +56,16 @@ export default function ValuesPanel({ angle, activeFunctions, onExplain }: Props
   const tanSign = tanVal >= 0 ? '+' : '-';
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-3 sm:p-4 md:p-5 w-full max-w-sm flex flex-col gap-2 sm:gap-3 md:gap-5 font-sans border border-slate-100 h-full">
+    <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 p-3 sm:p-4 md:p-5 w-full max-w-sm flex flex-col gap-2 sm:gap-3 md:gap-5 font-sans border border-slate-100 h-full">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-2 sm:pb-3 shrink-0">
         <div className="flex items-center gap-2">
           <Calculator className="text-indigo-500 w-5 h-5" />
           <h2 className="text-lg font-bold text-slate-800">Values</h2>
         </div>
-        {specialAngle && (
-          <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] sm:text-xs font-bold rounded-full uppercase tracking-wide animate-pulse">
-            Special Angle
-          </span>
-        )}
+        <span className={`px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] sm:text-xs font-bold rounded-full uppercase tracking-wide transition-opacity duration-200 ${displaySpecial ? 'opacity-100' : 'opacity-0'}`}>
+          Special Angle
+        </span>
       </div>
 
       {/* Controls: Degrees / Radians Segmented Control */}
@@ -82,17 +91,16 @@ export default function ValuesPanel({ angle, activeFunctions, onExplain }: Props
       </div>
 
       {/* Angle & Coordinates */}
-      <div className="flex flex-col gap-3">
-        <div className="flex justify-between items-baseline">
-          <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Angle (θ)</span>
-          <span className="text-xl font-bold text-slate-800">
-            {unit === 'degrees' ? `${deg}°` : `${rad} rad`}
-          </span>
-        </div>
-        <div className="flex justify-between items-baseline">
-          <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Coordinates</span>
-          <span className="font-mono text-base font-medium text-slate-700">({xStr}, {yStr})</span>
-        </div>
+      <div className="grid grid-cols-2 gap-2 gap-y-2 items-center px-2">
+        <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Angle (θ)</span>
+        <span className="text-xl font-bold text-slate-800 text-right">
+          {unit === 'degrees' ? `${deg}°` : `${rad} rad`}
+        </span>
+        
+        <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Coordinates</span>
+        <span className="font-mono text-sm md:text-base font-medium text-slate-700 text-right break-words whitespace-normal flex flex-wrap justify-end max-w-full">
+          ({xStr}, {yStr})
+        </span>
       </div>
 
       <div className="h-px bg-slate-100 w-full"></div>
@@ -100,30 +108,30 @@ export default function ValuesPanel({ angle, activeFunctions, onExplain }: Props
       {/* Trig Values */}
       <div className="flex flex-col gap-2.5">
         {/* Cosine */}
-        <div className={`flex justify-between items-center px-3 py-2.5 rounded-xl border transition-colors ${activeFunctions.cos ? 'bg-blue-50/80 border-blue-100/50' : 'bg-slate-50 border-slate-100 opacity-50'}`}>
+        <div className={`flex justify-between items-center px-3 py-2.5 rounded-xl border transition-all duration-300 ${activeFunctions.cos ? 'bg-blue-50 border-blue-200 shadow-sm' : 'bg-slate-50 border-slate-100 opacity-50'}`}>
           <div className="flex items-baseline gap-2">
             <span className={`font-bold text-lg ${activeFunctions.cos ? 'text-blue-600' : 'text-slate-500'}`}>cos θ</span>
-            <span className={`text-sm font-medium ${activeFunctions.cos ? 'text-blue-400/80' : 'text-slate-400'}`}>= x</span>
+            <span className={`text-sm font-medium ${activeFunctions.cos ? 'text-blue-400' : 'text-slate-400'}`}>= x</span>
           </div>
           <span className={`font-mono font-semibold text-lg ${activeFunctions.cos ? 'text-blue-700' : 'text-slate-600'}`}>{xStr}</span>
         </div>
         
         {/* Sine */}
-        <div className={`flex justify-between items-center px-3 py-2.5 rounded-xl border transition-colors ${activeFunctions.sin ? 'bg-rose-50/80 border-rose-100/50' : 'bg-slate-50 border-slate-100 opacity-50'}`}>
+        <div className={`flex justify-between items-center px-3 py-2.5 rounded-xl border transition-all duration-300 ${activeFunctions.sin ? 'bg-green-50 border-green-200 shadow-sm' : 'bg-slate-50 border-slate-100 opacity-50'}`}>
           <div className="flex items-baseline gap-2">
-            <span className={`font-bold text-lg ${activeFunctions.sin ? 'text-rose-600' : 'text-slate-500'}`}>sin θ</span>
-            <span className={`text-sm font-medium ${activeFunctions.sin ? 'text-rose-400/80' : 'text-slate-400'}`}>= y</span>
+            <span className={`font-bold text-lg ${activeFunctions.sin ? 'text-green-600' : 'text-slate-500'}`}>sin θ</span>
+            <span className={`text-sm font-medium ${activeFunctions.sin ? 'text-green-400' : 'text-slate-400'}`}>= y</span>
           </div>
-          <span className={`font-mono font-semibold text-lg ${activeFunctions.sin ? 'text-rose-700' : 'text-slate-600'}`}>{yStr}</span>
+          <span className={`font-mono font-semibold text-lg ${activeFunctions.sin ? 'text-green-700' : 'text-slate-600'}`}>{yStr}</span>
         </div>
 
         {/* Tangent */}
-        <div className={`flex justify-between items-center px-3 py-2.5 rounded-xl border transition-colors ${activeFunctions.tan ? 'bg-emerald-50/80 border-emerald-100/50' : 'bg-slate-50 border-slate-100 opacity-50'}`}>
+        <div className={`flex justify-between items-center px-3 py-2.5 rounded-xl border transition-all duration-300 ${activeFunctions.tan ? 'bg-orange-50 border-orange-200 shadow-sm' : 'bg-slate-50 border-slate-100 opacity-50'}`}>
           <div className="flex items-baseline gap-2">
-            <span className={`font-bold text-lg ${activeFunctions.tan ? 'text-emerald-600' : 'text-slate-500'}`}>tan θ</span>
-            <span className={`text-sm font-medium ${activeFunctions.tan ? 'text-emerald-400/80' : 'text-slate-400'}`}>= y/x</span>
+            <span className={`font-bold text-lg ${activeFunctions.tan ? 'text-orange-600' : 'text-slate-500'}`}>tan θ</span>
+            <span className={`text-sm font-medium ${activeFunctions.tan ? 'text-orange-400' : 'text-slate-400'}`}>= y/x</span>
           </div>
-          <span className={`font-mono font-semibold text-lg ${activeFunctions.tan ? 'text-emerald-700' : 'text-slate-600'}`}>{tanStr}</span>
+          <span className={`font-mono font-semibold text-lg ${activeFunctions.tan ? 'text-orange-700' : 'text-slate-600'}`}>{tanStr}</span>
         </div>
       </div>
 
@@ -158,7 +166,7 @@ export default function ValuesPanel({ angle, activeFunctions, onExplain }: Props
       {onExplain && (
         <button 
           onClick={onExplain}
-          className="mt-auto w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-sm font-semibold transition-colors border border-indigo-200 flex items-center justify-center gap-2"
+          className="mt-auto w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-sm font-semibold transition-all duration-300 active:scale-95 border border-indigo-200 flex items-center justify-center gap-2"
         >
           <Info size={16} />
           Explain This Angle

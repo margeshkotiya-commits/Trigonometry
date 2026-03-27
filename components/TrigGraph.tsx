@@ -5,9 +5,10 @@ interface Props {
   angle: number;
   activeFunctions: ActiveFunctions;
   isExpanded?: boolean;
+  isDark?: boolean;
 }
 
-export default function TrigGraph({ angle, activeFunctions, isExpanded = false }: Props) {
+export default function TrigGraph({ angle, activeFunctions, isExpanded = false, isDark = false }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [aspectRatio, setAspectRatio] = useState(2);
 
@@ -106,24 +107,24 @@ export default function TrigGraph({ angle, activeFunctions, isExpanded = false }
         </defs>
 
         {/* Grid */}
-        <g stroke="#e2e8f0" strokeWidth={0.015 * strokeScale}>
+        <g stroke={isDark ? "#334155" : "#e2e8f0"} strokeWidth={0.015 * strokeScale}>
           {/* X Axis */}
-          <line x1={vbX} y1="0" x2={vbX + vbW} y2="0" stroke="#64748b" strokeWidth={0.03 * strokeScale} />
+          <line x1={vbX} y1="0" x2={vbX + vbW} y2="0" stroke={isDark ? "#94a3b8" : "#64748b"} strokeWidth={0.03 * strokeScale} />
           
           {/* Y Axis lines */}
-          <line x1={vbX} y1="-1" x2={vbX + vbW} y2="-1" strokeDasharray={`${0.05 * strokeScale} ${0.05 * strokeScale}`} stroke="#cbd5e1" />
-          <line x1={vbX} y1="1" x2={vbX + vbW} y2="1" strokeDasharray={`${0.05 * strokeScale} ${0.05 * strokeScale}`} stroke="#cbd5e1" />
+          <line x1={vbX} y1="-1" x2={vbX + vbW} y2="-1" strokeDasharray={`${0.05 * strokeScale} ${0.05 * strokeScale}`} stroke={isDark ? "#475569" : "#cbd5e1"} />
+          <line x1={vbX} y1="1" x2={vbX + vbW} y2="1" strokeDasharray={`${0.05 * strokeScale} ${0.05 * strokeScale}`} stroke={isDark ? "#475569" : "#cbd5e1"} />
           <line x1={vbX} y1="-0.5" x2={vbX + vbW} y2="-0.5" strokeDasharray={`${0.05 * strokeScale} ${0.05 * strokeScale}`} />
           <line x1={vbX} y1="0.5" x2={vbX + vbW} y2="0.5" strokeDasharray={`${0.05 * strokeScale} ${0.05 * strokeScale}`} />
           
           {/* Vertical lines */}
           {[0, Math.PI/2, Math.PI, 3*Math.PI/2, 2*Math.PI].map((x, i) => (
-            <line key={i} x1={x} y1={vbY} x2={x} y2={vbY + vbH} strokeDasharray={`${0.05 * strokeScale} ${0.05 * strokeScale}`} stroke={x === 0 ? "#64748b" : "#e2e8f0"} strokeWidth={x === 0 ? 0.03 * strokeScale : 0.015 * strokeScale} />
+            <line key={i} x1={x} y1={vbY} x2={x} y2={vbY + vbH} strokeDasharray={`${0.05 * strokeScale} ${0.05 * strokeScale}`} stroke={x === 0 ? (isDark ? "#94a3b8" : "#64748b") : (isDark ? "#334155" : "#e2e8f0")} strokeWidth={x === 0 ? 0.03 * strokeScale : 0.015 * strokeScale} />
           ))}
         </g>
         
         {/* Labels */}
-        <g fontSize={0.15 * strokeScale} className="fill-slate-500 font-sans font-medium select-none" textAnchor="middle">
+        <g fontSize={0.15 * strokeScale} className={`${isDark ? "fill-slate-400" : "fill-slate-500"} font-sans font-medium select-none`} textAnchor="middle">
           <text x="0" y={1.2}>0</text>
           <text x={Math.PI/2} y={1.2}>π/2</text>
           <text x={Math.PI} y={1.2}>π</text>
@@ -134,8 +135,8 @@ export default function TrigGraph({ angle, activeFunctions, isExpanded = false }
           <text x="-0.1" y="1.05" textAnchor="end">-1</text>
           
           {/* Axis Labels */}
-          <text x={2 * Math.PI + 0.2} y="0.15" className="fill-slate-700 font-bold" fontSize={0.18 * strokeScale}>θ</text>
-          <text x="-0.1" y="-1.3" className="fill-slate-700 font-bold" fontSize={0.18 * strokeScale}>y</text>
+          <text x={2 * Math.PI + 0.2} y="0.15" className={`${isDark ? "fill-slate-300" : "fill-slate-700"} font-bold`} fontSize={0.18 * strokeScale}>θ</text>
+          <text x="-0.1" y="-1.3" className={`${isDark ? "fill-slate-300" : "fill-slate-700"} font-bold`} fontSize={0.18 * strokeScale}>y</text>
         </g>
 
         {/* Full Paths (Faded) */}
@@ -153,7 +154,7 @@ export default function TrigGraph({ angle, activeFunctions, isExpanded = false }
         </g>
         
         {/* Current Angle Line */}
-        <line x1={angle} y1={vbY} x2={angle} y2={vbY + vbH} stroke="#94a3b8" strokeWidth={0.03 * strokeScale} strokeDasharray={`${0.1 * strokeScale} ${0.1 * strokeScale}`} />
+        <line x1={angle} y1={vbY} x2={angle} y2={vbY + vbH} stroke={isDark ? "#cbd5e1" : "#94a3b8"} strokeWidth={0.03 * strokeScale} strokeDasharray={`${0.1 * strokeScale} ${0.1 * strokeScale}`} />
         
         {/* Points */}
         {activeFunctions.sin && <circle cx={angle} cy={-Math.sin(angle)} r={pointRadius * 1.5} fill="#10b981" filter="url(#glow-strong)" />}
