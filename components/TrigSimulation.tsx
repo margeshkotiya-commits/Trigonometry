@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import UnitCircle from './UnitCircle';
 import TrigGraph from './TrigGraph';
@@ -17,9 +17,12 @@ export type ActiveFunctions = { sin: boolean; cos: boolean; tan: boolean };
 export type Options = { specialAngles: boolean; labels: boolean; grid: boolean; triangle: boolean };
 
 export default function TrigSimulation() {
+  const unitCircleRef = useRef<any>(null);
+  const trigGraphRef = useRef<any>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [angle, setAngle] = useState(Math.PI / 4); // 45 degrees
+  const angleRef = useRef(Math.PI / 4);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed] = useState(0.5); // radians per second
   const [activeFunctions, setActiveFunctions] = useState<ActiveFunctions>({ sin: true, cos: true, tan: false });
@@ -34,21 +37,45 @@ export default function TrigSimulation() {
     setIsMounted(true);
   }, []);
 
+  // Sync ref when UI manually changes angle
+  useEffect(() => {
+    angleRef.current = angle;
+  }, [angle]);
+
   useEffect(() => {
     let animationFrameId: number;
     let lastTime = performance.now();
+    let lastStateUpdate = performance.now();
 
     const animate = (time: number) => {
       if (isPlaying) {
         const deltaTime = time - lastTime;
-        setAngle((prev) => {
-          let newAngle = prev + (speed * deltaTime) / 1000;
-          if (newAngle >= 2 * Math.PI) newAngle -= 2 * Math.PI;
-          return newAngle;
-        });
+        lastTime = time;
+
+        let newAngle = angleRef.current + (speed * deltaTime) / 1000;
+        if (newAngle >= 2 * Math.PI) newAngle -= 2 * Math.PI;
+        angleRef.current = newAngle;
+
+        // Canvas/SVG updates -> every frame via DOM ref
+        if (unitCircleRef.current?.updateAngle) {
+          unitCircleRef.current.updateAngle(newAngle);
+        }
+        if (trigGraphRef.current?.updateAngle) {
+          trigGraphRef.current.updateAngle(newAngle);
+        }
+
+        // React state updates -> throttled to ~60ms to prevent UI stutter
+        if (time - lastStateUpdate > 60) {
+          setAngle(newAngle);
+          lastStateUpdate = time;
+        }
+      } else {
+        lastTime = time;
       }
-      lastTime = time;
-      animationFrameId = requestAnimationFrame(animate);
+      
+      if (isPlaying && mode !== 'practice') {
+        animationFrameId = requestAnimationFrame(animate);
+      }
     };
 
     if (isPlaying && mode !== 'practice') {
@@ -111,11 +138,11 @@ export default function TrigSimulation() {
         </div>
       </header>
       
-      <div className="flex-grow min-h-0 flex flex-col gap-2 sm:gap-3 md:gap-4">
+      <div className="flex-grow min-h-0 flex flex-col gap-2 md:gap-3 lg:gap-4">
         {/* Top Section */}
-        <div className={`${isGraphExpanded ? 'hidden' : 'flex-[5]'} min-h-0 grid grid-cols-2 grid-rows-[minmax(0,3fr)_minmax(0,2fr)] lg:grid-cols-12 lg:grid-rows-1 gap-2 sm:gap-3 md:gap-4`}>
+        <div className={`${isGraphExpanded ? 'hidden' : 'flex-[5]'} min-h-0 grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-2 md:gap-3 lg:gap-4`}>
           {/* Left Panel */}
-          <div className="col-span-1 lg:col-span-3 bg-white rounded-2xl shadow-md p-2 sm:p-3 md:p-4 min-h-0 overflow-y-auto flex flex-col order-2 lg:order-1 relative">
+          <div className="col-span-1 md:col-span-3 lg:col-span-3 bg-white rounded-2xl shadow-md p-2 md:p-3 lg:p-4 min-h-0 overflow-y-auto flex flex-col order-2 md:order-2 lg:order-1 relative">
             {mode === 'practice' ? (
               <GamePanel setAngle={setAngle} setActiveFunctions={setActiveFunctions} />
             ) : (
@@ -124,12 +151,12 @@ export default function TrigSimulation() {
           </div>
           
           {/* Center Circle */}
-          <div className="col-span-2 lg:col-span-6 bg-white rounded-2xl shadow-md p-2 sm:p-3 md:p-4 flex items-center justify-center min-h-0 min-w-0 order-1 lg:order-2">
-            <UnitCircle angle={angle} setAngle={setAngle} activeFunctions={activeFunctions} options={options} />
+          <div className="col-span-1 md:col-span-6 lg:col-span-6 bg-white rounded-2xl shadow-md p-0 flex items-center justify-center min-h-0 min-w-0 order-1 md:order-1 lg:order-2 overflow-hidden">
+            <UnitCircle ref={unitCircleRef} angle={angle} setAngle={setAngle} activeFunctions={activeFunctions} options={options} />
           </div>
 
           {/* Right Panel */}
-          <div className="col-span-1 lg:col-span-3 bg-white rounded-2xl shadow-md p-2 sm:p-3 md:p-4 min-h-0 overflow-y-auto flex flex-col order-3 lg:order-3 relative">
+          <div className="col-span-1 md:col-span-3 lg:col-span-3 bg-white rounded-2xl shadow-md p-2 md:p-3 lg:p-4 min-h-0 overflow-y-auto flex flex-col order-3 md:order-3 lg:order-3 relative">
             <Controls 
               isPlaying={isPlaying} 
               setIsPlaying={setIsPlaying}
@@ -144,7 +171,7 @@ export default function TrigSimulation() {
         </div>
 
         {/* Bottom Graph Panel */}
-        <div className={`${isGraphExpanded ? 'fixed inset-2 sm:inset-4 z-50 shadow-2xl' : 'flex-[4] shadow-md'} min-h-0 bg-white rounded-2xl p-2 sm:p-3 md:p-4 flex flex-col transition-all duration-300`}>
+        <div className={`${isGraphExpanded ? 'fixed inset-2 sm:inset-4 z-50 shadow-2xl' : 'flex-[4] shadow-md'} min-h-0 bg-white rounded-2xl p-2 md:p-3 lg:p-4 flex flex-col transition-all duration-300`}>
           <div className="flex justify-between items-center mb-1 sm:mb-2 shrink-0">
             <h2 className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider">Graphs</h2>
             <button 
@@ -159,11 +186,11 @@ export default function TrigSimulation() {
             </button>
           </div>
           <div className="flex-grow min-h-0 overflow-hidden relative rounded-xl border border-slate-100 bg-slate-50/50 w-full h-full flex items-center justify-center">
-            <TrigGraph angle={angle} activeFunctions={activeFunctions} isExpanded={isGraphExpanded} />
+            <TrigGraph ref={trigGraphRef} angle={angle} activeFunctions={activeFunctions} isExpanded={isGraphExpanded} />
             
             {/* Mini Unit Circle when expanded */}
             {isGraphExpanded && (
-              <div className="absolute top-2 right-2 sm:top-4 sm:right-4 w-28 h-28 sm:w-48 sm:h-48 bg-white/90 backdrop-blur-md rounded-xl border border-slate-200 shadow-lg p-1 sm:p-2 z-10">
+              <div className="absolute top-2 right-2 sm:top-4 sm:right-4 w-28 h-28 sm:w-48 sm:h-48 bg-white/90 backdrop-blur-md rounded-xl border border-slate-200 shadow-lg p-0 z-10">
                 <UnitCircle angle={angle} setAngle={setAngle} activeFunctions={activeFunctions} options={{...options, labels: false}} />
               </div>
             )}

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect, useState } from 'react';
+import React, { useMemo, useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { ActiveFunctions } from './TrigSimulation';
 
 interface Props {
@@ -8,9 +8,43 @@ interface Props {
   isDark?: boolean;
 }
 
-export default function TrigGraph({ angle, activeFunctions, isExpanded = false, isDark = false }: Props) {
+const TrigGraph = forwardRef(function TrigGraph({ angle, activeFunctions, isExpanded = false, isDark = false }: Props, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [aspectRatio, setAspectRatio] = useState(2);
+
+  const clipRectRef = useRef<SVGRectElement>(null);
+  const angleLineRef = useRef<SVGLineElement>(null);
+  const sinPointRef = useRef<SVGCircleElement>(null);
+  const cosPointRef = useRef<SVGCircleElement>(null);
+  const tanPointRef = useRef<SVGCircleElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    updateAngle: (newAngle: number) => {
+      if (clipRectRef.current) clipRectRef.current.setAttribute('width', (newAngle + 10).toString());
+      if (angleLineRef.current) {
+        angleLineRef.current.setAttribute('x1', newAngle.toString());
+        angleLineRef.current.setAttribute('x2', newAngle.toString());
+      }
+      if (sinPointRef.current) {
+        sinPointRef.current.setAttribute('cx', newAngle.toString());
+        sinPointRef.current.setAttribute('cy', (-Math.sin(newAngle)).toString());
+      }
+      if (cosPointRef.current) {
+        cosPointRef.current.setAttribute('cx', newAngle.toString());
+        cosPointRef.current.setAttribute('cy', (-Math.cos(newAngle)).toString());
+      }
+      if (tanPointRef.current) {
+        tanPointRef.current.setAttribute('cx', newAngle.toString());
+        const tY = Math.tan(newAngle);
+        if (Math.abs(tY) <= 5) {
+          tanPointRef.current.setAttribute('cy', (-tY).toString());
+          tanPointRef.current.setAttribute('opacity', '1');
+        } else {
+          tanPointRef.current.setAttribute('opacity', '0');
+        }
+      }
+    }
+  }));
 
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
@@ -98,7 +132,7 @@ export default function TrigGraph({ angle, activeFunctions, isExpanded = false, 
       >
         <defs>
           <clipPath id="graph-clip">
-            <rect x="-10" y="-10" width={angle + 10} height="20" />
+            <rect ref={clipRectRef} x="-10" y="-10" width={angle + 10} height="20" />
           </clipPath>
           <filter id="glow-strong" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation={0.05 * strokeScale} result="blur" />
@@ -154,13 +188,15 @@ export default function TrigGraph({ angle, activeFunctions, isExpanded = false, 
         </g>
         
         {/* Current Angle Line */}
-        <line x1={angle} y1={vbY} x2={angle} y2={vbY + vbH} stroke={isDark ? "#cbd5e1" : "#94a3b8"} strokeWidth={0.03 * strokeScale} strokeDasharray={`${0.1 * strokeScale} ${0.1 * strokeScale}`} />
+        <line ref={angleLineRef} x1={angle} y1={vbY} x2={angle} y2={vbY + vbH} stroke={isDark ? "#cbd5e1" : "#94a3b8"} strokeWidth={0.03 * strokeScale} strokeDasharray={`${0.1 * strokeScale} ${0.1 * strokeScale}`} />
         
         {/* Points */}
-        {activeFunctions.sin && <circle cx={angle} cy={-Math.sin(angle)} r={pointRadius * 1.5} fill="#10b981" filter="url(#glow-strong)" />}
-        {activeFunctions.cos && <circle cx={angle} cy={-Math.cos(angle)} r={pointRadius * 1.5} fill="#3b82f6" filter="url(#glow-strong)" />}
-        {activeFunctions.tan && Math.abs(Math.tan(angle)) <= 5 && <circle cx={angle} cy={-Math.tan(angle)} r={pointRadius * 1.5} fill="#f97316" filter="url(#glow-strong)" />}
+        {activeFunctions.sin && <circle ref={sinPointRef} cx={angle} cy={-Math.sin(angle)} r={pointRadius * 1.5} fill="#10b981" filter="url(#glow-strong)" />}
+        {activeFunctions.cos && <circle ref={cosPointRef} cx={angle} cy={-Math.cos(angle)} r={pointRadius * 1.5} fill="#3b82f6" filter="url(#glow-strong)" />}
+        {activeFunctions.tan && <circle ref={tanPointRef} opacity={Math.abs(Math.tan(angle)) <= 5 ? 1 : 0} cx={angle} cy={Math.abs(Math.tan(angle)) <= 5 ? -Math.tan(angle) : 0} r={pointRadius * 1.5} fill="#f97316" filter="url(#glow-strong)" />}
       </svg>
     </div>
   );
-}
+});
+
+export default React.memo(TrigGraph);

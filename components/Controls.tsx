@@ -13,7 +13,7 @@ interface Props {
   setAngle: (val: number) => void;
 }
 
-export default function Controls({ isPlaying, setIsPlaying, activeFunctions, setActiveFunctions, options, setOptions, angle, setAngle }: Props) {
+const Controls = React.memo(function Controls({ isPlaying, setIsPlaying, activeFunctions, setActiveFunctions, options, setOptions, angle, setAngle }: Props) {
   const [inputUnit, setInputUnit] = useState<'degrees' | 'radians'>('degrees');
   const [inputValue, setInputValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -26,8 +26,10 @@ export default function Controls({ isPlaying, setIsPlaying, activeFunctions, set
     if (inputUnit === 'degrees') {
       let deg = Math.round(normalized * 180 / Math.PI);
       if (deg === 360) deg = 0;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInputValue(deg.toString());
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInputValue(normalized.toFixed(3));
     }
   }, [angle, inputUnit, isFocused]);
@@ -159,7 +161,9 @@ export default function Controls({ isPlaying, setIsPlaying, activeFunctions, set
       </div>
     </div>
   );
-}
+});
+
+export default Controls;
 
 function Toggle({ label, color, active, onClick }: any) {
   return (

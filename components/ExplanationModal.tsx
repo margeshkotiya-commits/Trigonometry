@@ -25,12 +25,26 @@ export default function ExplanationModal({ angle, onClose }: Props) {
   const tanStr = specialAngle ? specialAngle.tan : (Math.abs(tanVal) > 100 ? '±∞' : tanVal.toFixed(3));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm pointer-events-auto" onClick={onClose} />
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 sm:p-6 max-w-lg w-full relative z-10 pointer-events-auto border border-slate-100 dark:border-slate-700 flex flex-col gap-4 max-h-[90vh] overflow-y-auto transition-colors duration-300">
-        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-full p-1 transition-colors"><X size={20} /></button>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm pointer-events-auto" 
+        onClick={onClose} 
+      />
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-2xl shadow-2xl px-6 py-5 max-w-lg w-full relative z-10 pointer-events-auto border border-blue-700/50 flex flex-col gap-5 max-h-[90vh] overflow-y-auto"
+      >
+        <button onClick={onClose} className="absolute top-4 right-4 text-white/70 hover:text-white hover:bg-white/10 rounded-full p-1.5 transition-colors">
+          <X size={20} />
+        </button>
         
-        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 pr-8">Understanding {deg}°</h2>
+        <h2 className="text-xl font-bold text-white pr-8">Understanding {deg}°</h2>
         
         <div className="flex flex-col gap-6">
           {/* Step 1 */}
@@ -38,24 +52,24 @@ export default function ExplanationModal({ angle, onClose }: Props) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="flex flex-col gap-2"
+            className="flex flex-col gap-2.5"
           >
-            <h3 className="font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider text-sm">Step 1: The Triangle</h3>
-            <p className="text-slate-600 dark:text-slate-300 text-sm">
+            <h3 className="font-bold text-blue-300 uppercase tracking-wide text-xs">Step 1: The Triangle</h3>
+            <p className="text-gray-200 text-sm leading-relaxed">
               Imagine a right triangle inside the unit circle. The hypotenuse (longest side) is always the radius of the circle, which is <strong>1</strong>.
             </p>
-            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex justify-center transition-colors duration-300">
+            <div className="bg-white/5 p-4 rounded-xl border border-white/10 flex justify-center backdrop-blur-md shadow-inner">
               <svg viewBox="-1.2 -1.2 2.4 2.4" className="w-32 h-32 overflow-visible">
-                <circle cx="0" cy="0" r="1" fill="none" stroke="#cbd5e1" strokeWidth="0.02" />
-                <line x1="-1.2" y1="0" x2="1.2" y2="0" stroke="#94a3b8" strokeWidth="0.02" />
-                <line x1="0" y1="-1.2" x2="0" y2="1.2" stroke="#94a3b8" strokeWidth="0.02" />
+                <circle cx="0" cy="0" r="1" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.02" />
+                <line x1="-1.2" y1="0" x2="1.2" y2="0" stroke="rgba(255,255,255,0.2)" strokeWidth="0.02" />
+                <line x1="0" y1="-1.2" x2="0" y2="1.2" stroke="rgba(255,255,255,0.2)" strokeWidth="0.02" />
                 
-                <path d={`M 0 0 L ${cosVal} ${-sinVal} L ${cosVal} 0 Z`} fill="rgba(99, 102, 241, 0.1)" stroke="#6366f1" strokeWidth="0.02" />
-                <line x1="0" y1="0" x2={cosVal} y2={-sinVal} stroke="#64748b" strokeWidth="0.03" />
-                <line x1={cosVal} y1={0} x2={cosVal} y2={-sinVal} stroke="#22c55e" strokeWidth="0.03" strokeDasharray="0.05 0.05" />
-                <line x1="0" y1="0" x2={cosVal} y2="0" stroke="#3b82f6" strokeWidth="0.03" strokeDasharray="0.05 0.05" />
+                <path d={`M 0 0 L ${cosVal} ${-sinVal} L ${cosVal} 0 Z`} fill="rgba(255, 255, 255, 0.1)" stroke="white" strokeWidth="0.02" />
+                <line x1="0" y1="0" x2={cosVal} y2={-sinVal} stroke="rgba(255,255,255,0.6)" strokeWidth="0.03" />
+                <line x1={cosVal} y1={0} x2={cosVal} y2={-sinVal} stroke="#4ade80" strokeWidth="0.03" strokeDasharray="0.05 0.05" />
+                <line x1="0" y1="0" x2={cosVal} y2="0" stroke="#60a5fa" strokeWidth="0.03" strokeDasharray="0.05 0.05" />
                 
-                <circle cx={cosVal} cy={-sinVal} r="0.06" fill="#ef4444" />
+                <circle cx={cosVal} cy={-sinVal} r="0.06" fill="#f87171" style={{ filter: 'drop-shadow(0 0 6px rgba(248,113,113,0.8))' }} />
               </svg>
             </div>
           </motion.div>
@@ -64,14 +78,14 @@ export default function ExplanationModal({ angle, onClose }: Props) {
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex flex-col gap-2"
+            transition={{ delay: 0.2 }}
+            className="flex flex-col gap-2.5"
           >
-            <h3 className="font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider text-sm">Step 2: The Sides</h3>
-            <ul className="text-slate-600 dark:text-slate-300 text-sm list-disc pl-5 space-y-1">
+            <h3 className="font-bold text-blue-300 uppercase tracking-wide text-xs">Step 2: The Sides</h3>
+            <ul className="text-gray-200 text-sm list-disc pl-5 space-y-1.5 marker:text-blue-400">
               <li><strong>Hypotenuse</strong> = 1 (Radius)</li>
-              <li><strong>Opposite</strong> (vertical) = y = <span className="text-green-600 dark:text-green-400 font-mono">{yStr}</span></li>
-              <li><strong>Adjacent</strong> (horizontal) = x = <span className="text-blue-600 dark:text-blue-400 font-mono">{xStr}</span></li>
+              <li><strong>Opposite</strong> (vertical) = y = <span className="text-green-400 font-mono font-medium">{yStr}</span></li>
+              <li><strong>Adjacent</strong> (horizontal) = x = <span className="text-blue-400 font-mono font-medium">{xStr}</span></li>
             </ul>
           </motion.div>
 
@@ -79,30 +93,30 @@ export default function ExplanationModal({ angle, onClose }: Props) {
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex flex-col gap-2"
+            transition={{ delay: 0.3 }}
+            className="flex flex-col gap-3"
           >
-            <h3 className="font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider text-sm">Step 3: The Formulas (SOH CAH TOA)</h3>
+            <h3 className="font-bold text-blue-300 uppercase tracking-wide text-xs">Step 3: The Formulas (SOH CAH TOA)</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="bg-rose-50 dark:bg-rose-900/30 p-3 rounded-xl border border-rose-100 dark:border-rose-800/50 transition-colors duration-300">
-                <div className="font-bold text-rose-700 dark:text-rose-400 mb-1">sin(θ)</div>
-                <div className="text-xs text-rose-600 dark:text-rose-500 mb-2">Opposite / Hypotenuse</div>
-                <div className="font-mono text-sm text-rose-800 dark:text-rose-300">{yStr} / 1 = <strong>{yStr}</strong></div>
+              <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex flex-col items-center text-center">
+                <div className="font-bold text-white mb-1">sin(θ)</div>
+                <div className="text-[10px] uppercase tracking-wider text-blue-300 mb-2 font-semibold">Opp / Hyp</div>
+                <div className="font-mono text-sm text-green-300">{yStr} / 1 = <strong className="text-green-400 text-base">{yStr}</strong></div>
               </div>
-              <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-xl border border-blue-100 dark:border-blue-800/50 transition-colors duration-300">
-                <div className="font-bold text-blue-700 dark:text-blue-400 mb-1">cos(θ)</div>
-                <div className="text-xs text-blue-600 dark:text-blue-500 mb-2">Adjacent / Hypotenuse</div>
-                <div className="font-mono text-sm text-blue-800 dark:text-blue-300">{xStr} / 1 = <strong>{xStr}</strong></div>
+              <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex flex-col items-center text-center">
+                <div className="font-bold text-white mb-1">cos(θ)</div>
+                <div className="text-[10px] uppercase tracking-wider text-blue-300 mb-2 font-semibold">Adj / Hyp</div>
+                <div className="font-mono text-sm text-blue-300">{xStr} / 1 = <strong className="text-blue-400 text-base">{xStr}</strong></div>
               </div>
-              <div className="bg-emerald-50 dark:bg-emerald-900/30 p-3 rounded-xl border border-emerald-100 dark:border-emerald-800/50 transition-colors duration-300">
-                <div className="font-bold text-emerald-700 dark:text-emerald-400 mb-1">tan(θ)</div>
-                <div className="text-xs text-emerald-600 dark:text-emerald-500 mb-2">Opposite / Adjacent</div>
-                <div className="font-mono text-sm text-emerald-800 dark:text-emerald-300">{yStr} / {xStr} = <strong>{tanStr}</strong></div>
+              <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex flex-col items-center text-center">
+                <div className="font-bold text-white mb-1">tan(θ)</div>
+                <div className="text-[10px] uppercase tracking-wider text-blue-300 mb-2 font-semibold">Opp / Adj</div>
+                <div className="font-mono text-sm text-orange-300">{yStr} / {xStr} = <strong className="text-orange-400 text-base">{tanStr}</strong></div>
               </div>
             </div>
           </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
